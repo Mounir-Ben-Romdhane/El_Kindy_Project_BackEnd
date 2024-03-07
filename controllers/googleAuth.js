@@ -1,5 +1,5 @@
 // API for Google Authentication
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { sendEmail } from '../utils/sendMailer.js';
