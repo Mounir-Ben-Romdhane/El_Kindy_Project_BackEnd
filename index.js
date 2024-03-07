@@ -46,7 +46,7 @@ app.use(bodyParser.json({limit: "30mb", extended: true}));
 app.use(bodyParser.urlencoded({limit: "30mb", extended: true}));
 // Configure CORS to allow requests from http://localhost:3000
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000","https://el-kindy.vercel.app"],
     credentials: true // Include credentials in CORS request
   }));
 app.use("/assets", express.static(path.join(__dirname,'public/assets')));
