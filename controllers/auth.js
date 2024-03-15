@@ -1,8 +1,7 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { sendEmail } from '../utils/sendMailer.js';
-
 
 /* REGISTER USER */
 export const register = async (req, res) => {
@@ -59,11 +58,107 @@ export const login = async (req, res) => {
         await user.save();
 
         const accessToken = jwt.sign({ id: user._id, fullName: user.firstName + " " + user.lastName,
-         roles: user.roles,  email : user.email }, process.env.JWT_SECRET, {expiresIn:"10m"});
+         roles: user.roles,  email : user.email, picturePath: user.picturePath, authSource: user.authSource, gender: user.gender }, process.env.JWT_SECRET, {expiresIn:"30m"});
         
+     
+
         if(!user.verified) {
             const url = `http://localhost:3000/verify-account/${user._id}/verify/${accessToken}`;
-            await sendEmail(email,"Verify your email", url); // sends verification link to user's email
+            const body =`<!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Welcome to Elkindy</title>
+              <style>
+                @keyframes fadeIn {
+                  0% { opacity: 0; }
+                  100% { opacity: 1; }
+                }
+                body {
+                  font-family: 'Arial', sans-serif;
+                  background-color: #f7f7f7;
+                  margin: 0;
+                  padding: 0;
+                }
+                .email-container {
+                  max-width: 600px;
+                  margin: auto;
+                  background: #ffffff;
+                  border: 1px solid #cccccc;
+                  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+                }
+                .header {
+                  background-color: #4e8098; /* A calming blue-grey */
+                  color: #ffffff;
+                  padding: 20px;
+                  text-align: center;
+                }
+                .content img {
+                  max-width: 100%;
+                  height: auto;
+                  border-bottom: 5px solid #4e8098; /* Matching the header */
+                  display: block;
+                  margin-bottom: 30px;
+                }
+                .content {
+                  padding: 20px;
+                  color: #333333;
+                  text-align: center;
+                }
+                .content h2 {
+                  color: #4e8098;
+                  margin-bottom: 20px;
+                }
+                .content p {
+                  line-height: 1.6;
+                  margin-bottom: 15px;
+                }
+                .login-details {
+                  background-color: #e8e8e8; /* A light grey for contrast */
+                  border-left: 3px solid #4e8098;
+                  padding: 15px;
+                  margin: 25px 0;
+                  display: inline-block;
+                  transition: box-shadow 0.3s ease;
+
+                }
+                .login-details:hover {
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                }
+                .footer {
+                  background-color: #4e8098;
+                  color: #ffffff;
+                  text-align: center;
+                  padding: 10px;
+                  font-size: 12px;
+                }
+                /* Additional styles if necessary */
+              </style>
+            </head>
+            <body>
+              <div class="email-container">
+                <div class="content">
+                  <!-- Replace 'your-image-url.jpg' with the actual URL of your image -->
+                  <img class="image-with-border" src="https://i.imgur.com/4qQS8E2.jpeg" alt="Conservatory Scene">
+            
+                  <p>Dear ${user.firstName + " " + user.lastName},</p>
+                  <p>We are thrilled to welcome you to Elkindy, your new home for musical excellence. At Elkindy, we embrace the diversity of age, experience, and nationality, providing a vibrant community where music education is both accessible and exceptional.</p>
+                  <div class="login-details" style="width: 90%;">
+                    <h4><strong>Please verify your email:</strong></h4>
+                    <a href="${url}" style="display: inline-block; background-color: #4e8098; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify Email</a>
+                  </div>
+                  <p>We encourage you to log in promptly and start exploring the various resources available to you. Remember, the realm of music is vast, and every lesson is a step towards mastery. We are excited to see where this musical voyage will take you.</p>
+                  <p>Welcome aboard,</p>
+                  <p><strong>The Elkindy Team</strong></p>
+                </div>
+                <div class="footer">
+                  © 2024 Elkindy. All rights reserved.
+                </div>
+              </div>
+            </body>
+        </html>`;
+            await sendEmail(email,"Verify your emaill", body); // sends verification link to user's email
             console.log("Email send Successfullyyyyyyyy !");
             return res.status(401).json({status: false, message: "An email sent to your account ! please verify !"});
         }
@@ -84,22 +179,26 @@ export const refreshToken = async (req, res) => {
         
 
         if (!user || user.refreshToken !== refreshToken) {
-            return res.status(403).json({ message: "Invalid refresh token" });
+            return res.status(401).json({ message: "Invalid refresh token" });
         }
 
         // Check expiration date of refresh token
-        const decodedRefreshToken = jwt.decode(refreshToken);
-        if (decodedRefreshToken && decodedRefreshToken.exp && Date.now() >= decodedRefreshToken.exp * 1000) {
-            //console.log("Token expired!");
-            return res.status(401).json({ message: "Refresh token has expired" });
-        }
+       
 
         const accessToken = jwt.sign({ id: user._id, fullName: user.firstName + " " + user.lastName,
-        roles: user.roles,  email : user.email  }, process.env.JWT_SECRET, { expiresIn: "10m" });
+
+        roles: user.roles,  email : user.email, picturePath : user.picturePath  }, process.env.JWT_SECRET, { expiresIn: "30s" });
+
         res.json({ accessToken });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        if (error.name === 'TokenExpiredError') {
+            console.log("JWT expired:", error.message);
+            return res.status(401).json({ message: "JWT expired" });
+        } else {
+            console.log("Error:", error.message);
+            return res.status(500).json({ message: "Internal Server Error" });
+        }
+    
     }
 };
 
@@ -189,3 +288,35 @@ export const getUser = async (req, res) => {
       res.status(500).json(error);
     }
   };
+//Get all User by Role
+export const getAllUserByRole = async (req, res) => {
+    const role = req.params.role;
+    try {
+        const users = await User.find({roles: role});
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+};
+
+
+//planning
+export const getTeachers = async (req, res) => {
+  try {
+      const teachers = await User.find({ roles: 'teacher' });
+      res.status(200).json(teachers);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+};
+
+// Fonction pour récupérer tous les étudiants
+export const getStudents = async (req, res) => {
+  try {
+      const students = await User.find({ roles: 'student' });
+      res.status(200).json(students);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+};
+

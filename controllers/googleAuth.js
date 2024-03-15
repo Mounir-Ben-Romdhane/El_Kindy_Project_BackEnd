@@ -1,5 +1,5 @@
 // API for Google Authentication
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { sendEmail } from '../utils/sendMailer.js';
@@ -36,9 +36,10 @@ const googleAuth = async (req, res) => {
     const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
     user.refreshToken = refreshToken;
     await user.save();
+
     const accessToken = jwt.sign({ id: user._id, fullName: user.firstName + " " + user.lastName, roles: user.roles ,
-      email : user.email}, process.env.JWT_SECRET, { expiresIn: "10s" });
-    
+      email : user.email, picturePath: user.picturePath, authSource: user.authSource , gender: user.gender}, process.env.JWT_SECRET, { expiresIn: "30m" });    
+
     // Return the tokens and user data
     return res.status(200).json({ accessToken, refreshToken: user.refreshToken, message: "Logged in successfully" });
   } catch (err) {

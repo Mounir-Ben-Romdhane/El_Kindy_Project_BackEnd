@@ -51,6 +51,10 @@ const inscriptionSchema = new mongoose.Schema({
     }],
     default: []
   },
+  disponibilite: {
+    type: Array,
+    default: []
+  },
   status: {
     type: String,
     enum: ['pending', 'accepted', 'refused'],

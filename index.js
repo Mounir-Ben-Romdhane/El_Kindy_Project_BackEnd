@@ -68,6 +68,8 @@ app.post("/course/add",upload.single("picture"),addNewCourse);
 app.patch("/course/update/:id",upload.single("picture"),verifyToken, updateCourse);
 
 app.post("/event/add",upload.single("picture"),addNewEvent);
+app.patch("/event/update/:id",upload.single("picture"),updateEvent);
+app.use("/planning", planningRoutes);
 
 app.post("/api/categories", upload.single("picture"), createCategorie);
 app.put("/api/categories/:id", upload.single("picture"), updateCategorie);
@@ -77,6 +79,21 @@ app.patch("/api/stage/:id", upload.single("picture"),updateStage );
 
 app.post("/addMessage", upload.single("picture"), addMessage);
 
+/*Twilio */
+dotenv.config();
+export const sendSms = (toPhoneNumber) => {
+    const formattedPhoneNumber = `+216${toPhoneNumber}`; // E.164 format
+    const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+
+    return client.messages
+        .create({
+            body: 'Thank you, Your Event Participation has been Accepted !',
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: formattedPhoneNumber // Format to +216 ( tunisian Number)
+        })
+        .then(message => console.log("Message sent:", message.sid))
+        .catch(err => console.error("Error sending message:", err));
+};
 
 
 /* ROUTES */
@@ -88,8 +105,10 @@ app.use("/course",courseRoute);
 app.use("/salle",salleRoutes);
 app.use("/inscription", inscriptionRoutes);
 
-app.use('/chat', ChatRoute)
-app.use('/message', MessageRoute)
+app.use('/chat', ChatRoute);
+app.use('/message', MessageRoute);
+app.use('/meeting', meetingRoutes);
+app.use("/events",reservationRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
