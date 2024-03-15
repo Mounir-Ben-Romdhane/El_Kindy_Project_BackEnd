@@ -9,7 +9,7 @@ import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from "url";
 import { addNewCourse, updateCourse } from "./controllers/courseController.js";
-import { addNewEvent } from "./controllers/event.js";
+import { addNewEvent, updateEvent } from "./controllers/event.js";
 import  { createCategorie, updateCategorie }  from "./controllers/categorieController.js"; // Import des routes de catégorie
 import eventRoutes from "./routes/Event.js";
 import salleRoutes from "./routes/salle.js";
@@ -18,6 +18,7 @@ import stageRouter  from "./routes/stageRoute.js";
 import authRoutes from "./routes/auth.js";
 import courseRoute from './routes/courseRoute.js'
 import { register } from "./controllers/auth.js";
+import twilio from "twilio";
 import { addMessage } from './controllers/MessageController.js';
 
 import User from './models/User.js';
@@ -31,6 +32,9 @@ import categorieRoutes from "./routes/categorieRoutes.js"; // Import des routes 
 import { verifyToken } from "./middleware/auth.js";
 import ChatRoute from './routes/ChatRoute.js'
 import MessageRoute from './routes/MessageRoute.js'
+import meetingRoutes from './routes/meetingRoutes.js';
+import reservationRoutes  from "./routes/Reservation.js";
+import planningRoutes from "./routes/planningRoutes.js";
 
 /* CONFIGURATION */
 const __filename = fileURLToPath(import.meta.url);
