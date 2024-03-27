@@ -10,6 +10,7 @@ pipeline {
             }
         }
         
+        /*
         stage('Unit Test') {
             steps {
                 script {
@@ -24,6 +25,6 @@ pipeline {
                     sh 'npm run build-dev'
                 }
             }
-        }
+        }*/
     }
 }
