@@ -20,23 +20,17 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            steps {
-                script {
-                    // Define the SonarQube scanner tool
-                    def scannerHome = tool 'scanner'
-
-                    // Run the SonarQube scanner with specified parameters
-                    sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=spartacusBackend \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://192.168.1.11:9000/ \
-                        -Dsonar.login=211394fdac05c478a8ea27ded41480fa47cbdb75
-                    """
-                }
-            }
+            steps{
+                script { 
+                def scannerHome = tool 'scanner'
+                sh "${scannerHome}/bin/sonar-scanner \
+                -Dsonar.projectKey=spartacusBackend \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=http://192.168.1.11:9000/ \
+                -Dsonar.login=211394fdac05c478a8ea27ded41480fa47cbdb75"
+                    } 
+                } 
         }
-
     }
 }
 
