@@ -6,6 +6,7 @@ pipeline {
             steps {
                 script {
                     sh 'npm install'
+                    sh 'chmod +x ./node_modules/.bin/nyc' // Update permissions for nyc executable
                 }
             }
         }
