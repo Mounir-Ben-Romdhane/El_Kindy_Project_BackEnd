@@ -30,7 +30,7 @@ pipeline {
                         ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=spartacusBackend \
                         -Dsonar.sources=. \
-                        -Dsonar.host.url=http://192.168.1.11:9000/ \
+                        -Dsonar.host.url=http://192.168.1.4:9000/ \
                         -Dsonar.login=211394fdac05c478a8ea27ded41480fa47cbdb75
                     """
                 }
