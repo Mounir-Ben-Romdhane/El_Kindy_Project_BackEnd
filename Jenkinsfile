@@ -55,14 +55,6 @@ pipeline {
             }
         }
 
-        stage('Build application') {
-            steps{
-                script {
-                    sh('npm run build-dev')
-                }
-            }
-        }
-
         stage('Building images (node and mongo)') {
             steps{
                 script {
@@ -70,6 +62,22 @@ pipeline {
                 }
             }
         }
+
+        stage('Build application') {
+            steps{
+                script {
+                    withCredentials([
+                        usernamePassword(credentialsId: registryCredentials, passwordVariable: 'REGISTRY_PASSWORD', usernameVariable: 'REGISTRY_USERNAME')
+                    ]) {
+                        sh '''
+                            echo "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin $registry
+                            docker push $registry/nodemongoapp:6.0
+                        '''
+                    }
+                }
+            }
+        }
+
 
         // Uploading Docker images into Nexus Registry 
         stage('Deploy to Nexus') { 
