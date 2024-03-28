@@ -10,6 +10,7 @@ pipeline {
                     sh 'npm cache clean --force'
                     
                     // Remove the problematic directory if it exists
+                    sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/mongoose/node_modules/gaxios'
                     sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/multer-gridfs-storage/node_modules/debug'
                     sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/mongoose/node_modules/https-proxy-agent'
                     sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/multer-gridfs-storage/node_modules/agent-base'
