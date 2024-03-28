@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     // Define the SonarQube scanner tool
-                    def scannerHome = tool 'sonar'
+                    def scannerHome = tool 'scanner'
 
                     // Run the SonarQube scanner with specified parameters
                     sh """
