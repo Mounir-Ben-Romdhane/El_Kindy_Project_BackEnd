@@ -2,20 +2,18 @@ pipeline {
     agent any
     
     stages {
+
+        stage('Remove node_modules') {
+            steps {
+                script {
+                    sh 'find /var/lib/jenkins/workspace/node-pipeline -name "node_modules" -type d -prune -exec rm -rf {} +'
+                }
+            }
+        }
+        
         stage('Install dependencies') {
             steps {
                 script {
-                    
-                    // Clean npm cache to avoid potential issues
-                    sh 'npm cache clean --force'
-                    
-                    // Remove the problematic directory if it exists
-                    sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/multer-gridfs-storage/node_modules/gaxios'
-                    sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/mongoose/node_modules/gaxios'
-                    sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/multer-gridfs-storage/node_modules/debug'
-                    sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/mongoose/node_modules/https-proxy-agent'
-                    sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/multer-gridfs-storage/node_modules/agent-base'
-                    sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/mongoose/node_modules/node-fetch'
                     
                     // Install dependencies
                     sh 'npm install'
