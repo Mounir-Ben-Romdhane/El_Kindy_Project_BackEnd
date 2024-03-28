@@ -6,6 +6,7 @@ pipeline {
             steps {
                 script {
                     sh 'npm install'
+                    sh 'npm install mocha-lcov-reporter'
                     sh 'chmod +x ./node_modules/.bin/nyc' // Update permissions for nyc executable
                     sh 'chmod +x ./node_modules/.bin/mocha'
                     sh './node_modules/.bin/mocha --reporter=lcov ./test/*.spec.cjs'
