@@ -10,6 +10,7 @@ pipeline {
                     sh 'npm cache clean --force'
                     
                     // Remove the problematic directory if it exists
+                    sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/multer-gridfs-storage/node_modules/agent-base'
                     sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/mongoose/node_modules/node-fetch'
                     
                     // Install dependencies
