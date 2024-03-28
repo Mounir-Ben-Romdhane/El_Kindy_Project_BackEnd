@@ -1,5 +1,10 @@
 pipeline {
     agent any
+
+    environment {
+        registryCredentials = "nexuslogin" 
+        registry = "192.168.1.4:8083" 
+        }
     
     stages {
 
@@ -62,6 +67,44 @@ pipeline {
             steps{
                 script {
                     sh('docker-compose build')
+                }
+            }
+        }
+
+        // Uploading Docker images into Nexus Registry 
+        stage('Deploy to Nexus') { 
+            steps{ 
+                script { 
+                    docker.withRegistry("http://"+registry, registryCredentials ) {
+                        sh('docker push $registry/nodemongoapp:6.0 ') 
+                    } 
+                } 
+            } 
+        }
+
+        stage('Run application ') {
+            steps{ 
+                script { 
+                    docker.withRegistry("http://"+registry, registryCredentials ) { 
+                        sh('docker pull $registry/nodemongoapp:6.0 ') 
+                        sh('docker-compose up -d ') 
+                    } 
+                } 
+            } 
+        }
+
+        stage("Run Prometheus"){
+            steps{
+                script{
+                    sh('docker start 08379f2285eb')
+                }
+            }
+        }
+
+        stage("Run Grafana"){ 
+            steps{
+                script{
+                    sh('docker start 39d45a3996ed')
                 }
             }
         }
