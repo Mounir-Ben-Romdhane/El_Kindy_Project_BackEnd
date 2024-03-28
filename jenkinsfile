@@ -11,6 +11,10 @@ pipeline {
                     // Remove the problematic directory if it exists
                     sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/mongoose/node_modules/debug'
                     
+                    // Remove the problematic directory if it exists
+                    sh 'rm -rf /var/lib/jenkins/workspace/node-pipeline/node_modules/mongoose/node_modules/agent-base'
+                    
+                    // Install mocha-lcov-reporter
                     sh 'npm install mocha-lcov-reporter'
                     sh('npm install kerberos @mongodb-js/zstd @aws-sdk/credential-providers snappy aws4 mongodb-client-encryption')
                     
