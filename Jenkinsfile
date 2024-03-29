@@ -78,8 +78,8 @@ pipeline {
         stage('Deploy to Nexus') { 
             steps{ 
                 script { 
+                    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
                     docker.withRegistry("http://"+registry, registryCredentials ) {
-                        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
                         sh('docker push $registry/nodemongoapp:6.0 ') 
                     } 
                 } 
