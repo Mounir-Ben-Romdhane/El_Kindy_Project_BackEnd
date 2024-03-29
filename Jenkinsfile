@@ -9,27 +9,27 @@ pipeline {
     
     stages {
 
-        // stage('Remove node_modules') {
-        //     steps {
-        //         script {
-        //             sh 'find /var/lib/jenkins/workspace/node-pipeline -name "node_modules" -type d -prune -exec rm -rf {} +'
-        //         }
-        //     }
-        // }
+        stage('Remove node_modules') {
+            steps {
+                script {
+                    sh 'find /var/lib/jenkins/workspace/node-pipeline -name "node_modules" -type d -prune -exec rm -rf {} +'
+                }
+            }
+        }
 
-        // stage('Install dependencies') {
-        //     steps {
-        //         script {
+        stage('Install dependencies') {
+            steps {
+                script {
                     
-        //             // Install dependencies
-        //             sh 'npm install'
-        //             sh 'chmod +x ./node_modules/.bin/nyc' // Update permissions for nyc executable
-        //             sh 'chmod +x ./node_modules/.bin/mocha'
-        //         }
-        //     }
-        // }
+                    // Install dependencies
+                    sh 'npm install'
+                    sh 'chmod +x ./node_modules/.bin/nyc' // Update permissions for nyc executable
+                    sh 'chmod +x ./node_modules/.bin/mocha'
+                }
+            }
+        }
         
-        /*
+        
         stage('Unit Test') {
             steps {
                 script {
@@ -54,24 +54,24 @@ pipeline {
                     """
                 }
             }
-        }*/
+        }
 
-        // stage('Build application') {
-        //     steps{
+        stage('Build application') {
+            steps{
                 
-        //         script {
-        //             sh('npm run build-dev')
-        //         }
-        //     }
-        // }
+                script {
+                    sh('npm run build-dev')
+                }
+            }
+        }
 
-        // stage('Building images (node and mongo)') {
-        //     steps{
-        //         script {
-        //             sh('docker-compose build')
-        //         }
-        //     }
-        // }
+        stage('Building images (node and mongo)') {
+            steps{
+                script {
+                    sh('docker-compose build')
+                }
+            }
+        }
 
 
         stage('Build application') {
