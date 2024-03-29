@@ -65,13 +65,13 @@ pipeline {
             }
         }
 
-        stage('Building images (node and mongo)') {
-            steps{
-                script {
-                    sh('docker-compose build')
-                }
-            }
-        }
+        // stage('Building images (node and mongo)') {
+        //     steps{
+        //         script {
+        //             sh('docker-compose build')
+        //         }
+        //     }
+        // }
 
 
         // Uploading Docker images into Nexus Registry 
