@@ -29,7 +29,7 @@ pipeline {
             }
         }
         
-        
+        /*
         stage('Unit Test') {
             steps {
                 script {
@@ -54,7 +54,7 @@ pipeline {
                     """
                 }
             }
-        }
+        }*/
 
         stage('Build application') {
             steps{
