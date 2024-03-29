@@ -4,6 +4,7 @@ pipeline {
     environment {
         registryCredentials = "nexuslogin" 
         registry = "192.168.1.4:8083" 
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
         }
     
     stages {
@@ -63,7 +64,7 @@ pipeline {
             }
         }
 
-        stage('Build application') {
+        stage('Build application & Push to Docker Hub') {
             steps{
                 script {
                         sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
