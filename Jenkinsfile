@@ -74,7 +74,7 @@ pipeline {
         }
 
 
-        stage('Build application') {
+        stage('Build application & push registry') {
             steps{
                 script {
                     withCredentials([
