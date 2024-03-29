@@ -74,6 +74,21 @@ pipeline {
         // }
 
 
+        stage('Build application') {
+            steps{
+                script {
+                    withCredentials([
+                        usernamePassword(credentialsId: registryCredentials, passwordVariable: 'REGISTRY_PASSWORD', usernameVariable: 'REGISTRY_USERNAME')
+                    ]) {
+                        sh '''
+                            echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin $registry
+                            docker push $registry/nodemongoapp:6.0
+                        '''
+                    }
+                }
+            }
+        }
+
         // Uploading Docker images into Nexus Registry 
         stage('Deploy to Nexus') { 
             steps{ 
