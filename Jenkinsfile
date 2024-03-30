@@ -65,48 +65,56 @@ pipeline {
             }
         }
 
-        // stage('Building images (node and mongo)') {
-        //     steps{
-        //         script {
-        //             sh('docker-compose build')
-        //         }
-        //     }
-        // }
-
-
-        stage('Build application & push registry') {
+        stage('Building images (node and mongo)') {
             steps{
                 script {
-                    withCredentials([
-                        usernamePassword(credentialsId: registryCredentials, passwordVariable: 'REGISTRY_PASSWORD', usernameVariable: 'REGISTRY_USERNAME')
-                    ]) {
-                        sh '''
-                            echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin $registry
-                            docker push $registry/nodemongoapp2:6.0
-                        '''
-                    }
+                    sh('docker-compose build')
                 }
             }
         }
 
+
+        // stage('Build application & push registry') {
+        //     steps{
+        //         script {
+        //             withCredentials([
+        //                 usernamePassword(credentialsId: registryCredentials, passwordVariable: 'REGISTRY_PASSWORD', usernameVariable: 'REGISTRY_USERNAME')
+        //             ]) {
+        //                 sh '''
+        //                     echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin $registry
+        //                     docker push $registry/nodemongoapp:6.0
+        //                 '''
+        //             }
+        //         }
+        //     }
+        // }
+
         // Uploading Docker images into Nexus Registry 
-        stage('Deploy to Nexus') { 
-            steps{ 
-                script { 
-                    docker.withRegistry("http://"+registry, registryCredentials ) {
-                        sh('docker push $registry/nodemongoapp2:6.0 ') 
-                    } 
-                } 
-            } 
-        }
+        // stage('Deploy to Nexus') { 
+        //     steps{ 
+        //         script { 
+        //             docker.withRegistry("http://"+registry, registryCredentials ) {
+        //                 sh('docker push $registry/nodemongoapp:6.0 ') 
+        //             } 
+        //         } 
+        //     } 
+        // }
+
+        // stage('Run application ') {
+        //     steps{ 
+        //         script { 
+        //             docker.withRegistry("http://"+registry, registryCredentials ) { 
+        //                 sh('docker pull $registry/nodemongoapp:6.0 ') 
+        //                 sh('docker-compose up -d ') 
+        //             } 
+        //         } 
+        //     } 
+        // }
 
         stage('Run application ') {
             steps{ 
                 script { 
-                    docker.withRegistry("http://"+registry, registryCredentials ) { 
-                        sh('docker pull $registry/nodemongoapp2:6.0 ') 
-                        sh('docker-compose up -d ') 
-                    } 
+                    sh('docker-compose up -d ')  
                 } 
             } 
         }
