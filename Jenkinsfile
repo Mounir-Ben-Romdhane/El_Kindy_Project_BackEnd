@@ -82,7 +82,7 @@ pipeline {
                     ]) {
                         sh '''
                             echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin $registry
-                            docker push $registry/nodemongoapp:6.0
+                            docker push $registry/nodemongoapp2:6.0
                         '''
                     }
                 }
@@ -94,7 +94,7 @@ pipeline {
             steps{ 
                 script { 
                     docker.withRegistry("http://"+registry, registryCredentials ) {
-                        sh('docker push $registry/nodemongoapp:6.0 ') 
+                        sh('docker push $registry/nodemongoapp2:6.0 ') 
                     } 
                 } 
             } 
@@ -104,7 +104,7 @@ pipeline {
             steps{ 
                 script { 
                     docker.withRegistry("http://"+registry, registryCredentials ) { 
-                        sh('docker pull $registry/nodemongoapp:6.0 ') 
+                        sh('docker pull $registry/nodemongoapp2:6.0 ') 
                         sh('docker-compose up -d ') 
                     } 
                 } 
