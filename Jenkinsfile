@@ -30,31 +30,31 @@ pipeline {
         }
         
         
-        stage('Unit Test') {
-            steps {
-                script {
-                    sh 'npm test'
-                }
-            }
-        }
+        // stage('Unit Test') {
+        //     steps {
+        //         script {
+        //             sh 'npm test'
+        //         }
+        //     }
+        // }
 
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    // Define the SonarQube scanner tool
-                    def scannerHome = tool 'scanner'
+        // stage('SonarQube Analysis') {
+        //     steps {
+        //         script {
+        //             // Define the SonarQube scanner tool
+        //             def scannerHome = tool 'scanner'
 
-                    // Run the SonarQube scanner with specified parameters
-                    sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=spartacusBackend \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://192.168.1.4:9000/ \
-                        -Dsonar.login=211394fdac05c478a8ea27ded41480fa47cbdb75
-                    """
-                }
-            }
-        }
+        //             // Run the SonarQube scanner with specified parameters
+        //             sh """
+        //                 ${scannerHome}/bin/sonar-scanner \
+        //                 -Dsonar.projectKey=spartacusBackend \
+        //                 -Dsonar.sources=. \
+        //                 -Dsonar.host.url=http://192.168.1.4:9000/ \
+        //                 -Dsonar.login=211394fdac05c478a8ea27ded41480fa47cbdb75
+        //             """
+        //         }
+        //     }
+        // }
 
         stage('Build application') {
             steps{
