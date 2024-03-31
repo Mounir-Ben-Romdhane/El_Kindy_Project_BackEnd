@@ -96,7 +96,7 @@ pipeline {
             steps {
                 script {
                     // Start Prometheus container
-                    sh('docker start 08379f2285eb')
+                    sh('docker start prometheus')
                 }
             }
         }
@@ -105,7 +105,7 @@ pipeline {
             steps {
                 script {
                     // Start Grafana container
-                    sh('docker start 39d45a3996ed')
+                    sh('docker start grafana')
                 }
             }
         }
