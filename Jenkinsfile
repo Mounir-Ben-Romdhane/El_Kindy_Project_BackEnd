@@ -2,20 +2,20 @@ pipeline {
     agent any
 
     environment {
-        registryCredentials = "nexuslogin" 
-        registry = "192.168.1.4:8083" 
+        registryCredentials = "nexuspi" 
+        registry = "localhost:8083" 
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
         }
     
     stages {
 
-        // stage('Remove node_modules') {
-        //     steps {
-        //         script {
-        //             sh 'find /var/lib/jenkins/workspace/node-pipeline -name "node_modules" -type d -prune -exec rm -rf {} +'
-        //         }
-        //     }
-        // }
+         stage('Remove node_modules') {
+             steps {
+                 script {
+                     sh 'find /var/lib/jenkins/workspace/node-pipeline -name "node_modules" -type d -prune -exec rm -rf {} +'
+                 }
+             }
+         }
 
         stage('Install dependencies') {
             steps {
@@ -30,31 +30,34 @@ pipeline {
         }
         
         
-        // stage('Unit Test') {
-        //     steps {
-        //         script {
-        //             sh 'npm test'
-        //         }
-        //     }
-        // }
+         stage('Unit Test') {
+             steps {
+                 script {
+                     sh 'npm test'
+                 }
+             }
+         }
 
-        // stage('SonarQube Analysis') {
+       //  stage('SonarQube Analysis') {
         //     steps {
-        //         script {
-        //             // Define the SonarQube scanner tool
-        //             def scannerHome = tool 'scanner'
+          //       script {
+          //           // Define the SonarQube scanner tool
+           //         def scannerHome = tool 'scanner'
 
-        //             // Run the SonarQube scanner with specified parameters
-        //             sh """
-        //                 ${scannerHome}/bin/sonar-scanner \
-        //                 -Dsonar.projectKey=spartacusBackend \
-        //                 -Dsonar.sources=. \
-        //                 -Dsonar.host.url=http://192.168.1.4:9000/ \
-        //                 -Dsonar.login=211394fdac05c478a8ea27ded41480fa47cbdb75
-        //             """
-        //         }
-        //     }
-        // }
+                    // Run the SonarQube scanner with specified parameters
+           //          sh """
+           //              ${scannerHome}/bin/sonar-scanner \
+          //               -Dsonar.projectKey=spartacusBackend \
+          //               -Dsonar.sources=. \
+          //               -Dsonar.host.url=http://localhost:9000/ \
+          //               -Dsonar.login=211394fdac05c478a8ea27ded41480fa47cbdb75
+          //           """
+          //       }
+          //   }
+      //  }
+
+
+
 
         stage('Build application') {
             steps{
@@ -74,42 +77,42 @@ pipeline {
         }
 
 
-        // stage('Build application & push registry') {
-        //     steps{
-        //         script {
-        //             withCredentials([
-        //                 usernamePassword(credentialsId: registryCredentials, passwordVariable: 'REGISTRY_PASSWORD', usernameVariable: 'REGISTRY_USERNAME')
-        //             ]) {
-        //                 sh '''
-        //                     echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin $registry
-        //                     docker push $registry/nodemongoapp:6.0
-        //                 '''
-        //             }
-        //         }
-        //     }
-        // }
+         stage('Build application & push registry') {
+             steps{
+                 script {
+                     withCredentials([
+                         usernamePassword(credentialsId: registryCredentials, passwordVariable: 'REGISTRY_PASSWORD', usernameVariable: 'REGISTRY_USERNAME')
+                     ]) {
+                         sh '''
+                           echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin $registry
+                           docker push $registry/nodemongoapp:6.0
+                         '''
+                     }
+                 }
+             }
+         }
 
-        // Uploading Docker images into Nexus Registry 
-        // stage('Deploy to Nexus') { 
-        //     steps{ 
-        //         script { 
-        //             docker.withRegistry("http://"+registry, registryCredentials ) {
-        //                 sh('docker push $registry/nodemongoapp:6.0 ') 
-        //             } 
-        //         } 
-        //     } 
-        // }
+         Uploading Docker images into Nexus Registry 
+         stage('Deploy to Nexus') { 
+             steps{ 
+                 script { 
+                     docker.withRegistry("http://"+registry, registryCredentials ) {
+                         sh('docker push $registry/nodemongoapp:6.0 ') 
+                     } 
+                 } 
+             } 
+         }
 
-        // stage('Run application ') {
-        //     steps{ 
-        //         script { 
-        //             docker.withRegistry("http://"+registry, registryCredentials ) { 
-        //                 sh('docker pull $registry/nodemongoapp:6.0 ') 
-        //                 sh('docker-compose up -d ') 
-        //             } 
-        //         } 
-        //     } 
-        // }
+         stage('Run application ') {
+             steps{ 
+                 script { 
+                     docker.withRegistry("http://"+registry, registryCredentials ) { 
+                         sh('docker pull $registry/nodemongoapp:6.0 ') 
+                         sh('docker-compose up -d ') 
+                     } 
+                 } 
+             } 
+         }
 
         stage('Run application ') {
             steps{ 
