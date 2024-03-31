@@ -12,14 +12,13 @@ pipeline {
     
     stages {
 
-        stage('Remove node_modules') {
-            steps {
-                script {
-                    // Remove node_modules directory
-                    sh 'find /var/lib/jenkins/workspace/node-pipeline -name "node_modules" -type d -prune -exec rm -rf {} +'
-                }
-            }
-        }
+       stage('Remove node_modules') {
+             steps {
+                 script {
+                     sh 'find /var/lib/jenkins/workspace/node-pipeline -name "node_modules" -type d -prune -exec rm -rf {} +'
+                 }
+             }
+         }
 
         stage('Install dependencies') {
             steps {
