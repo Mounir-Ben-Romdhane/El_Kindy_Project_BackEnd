@@ -69,16 +69,16 @@ pipeline {
         }
 
         // Uploading Docker images into Nexus Registry 
-        stage('Deploy to Nexus') {
-            steps {
-                script {
+      //  stage('Deploy to Nexus') {
+       //     steps {
+        //        script {
                     // Push Docker image to Nexus registry
-                    docker.withRegistry("http://"+registry, registryCredentials) {
-                        sh('docker push $registry/nodemongoapp:6.0') 
-                    } 
-                }
-            }
-        }
+       //             docker.withRegistry("http://"+registry, registryCredentials) {
+       //                 sh('docker push $registry/nodemongoapp:6.0') 
+       //             } 
+        //        }
+       //     }
+    //    }
 
         stage('Run application') {
             steps {
