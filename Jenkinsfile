@@ -92,7 +92,7 @@ pipeline {
              }
          }
 
-         Uploading Docker images into Nexus Registry 
+        // Uploading Docker images into Nexus Registry 
          stage('Deploy to Nexus') { 
              steps{ 
                  script { 
