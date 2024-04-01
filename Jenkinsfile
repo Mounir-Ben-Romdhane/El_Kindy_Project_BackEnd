@@ -131,4 +131,18 @@ pipeline {
             }
         }
     }
+
+    post {
+        success {
+            emailext subject: 'Pipeline Successful',
+                      body: 'Your pipeline has completed successfully.',
+                      to: 'your-email@example.com'
+        }
+        failure {
+            emailext subject: 'Pipeline Failed',
+                      body: 'Your pipeline has failed. Please check the logs for details.',
+                      to: 'your-email@example.com'
+        }
+    }
+    
 }
