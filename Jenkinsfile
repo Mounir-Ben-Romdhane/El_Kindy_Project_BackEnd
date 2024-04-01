@@ -3,9 +3,11 @@ pipeline {
 
     environment {
         // Define credentials for Nexus registry
-        registryCredentials = "nexuspi" 
+        //registryCredentials = "nexuspi" 
+        registryCredentials = "nexuslogin" 
         // Define the URL of the Nexus registry
-        registry = "localhost:8083" 
+        //registry = "localhost:8083"
+        registry = "172.20.10.2:8083"
         // Define Docker Hub credentials
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
@@ -69,16 +71,16 @@ pipeline {
         }
 
         // Uploading Docker images into Nexus Registry 
-      //  stage('Deploy to Nexus') {
-       //     steps {
-        //        script {
-                    // Push Docker image to Nexus registry
-       //             docker.withRegistry("http://"+registry, registryCredentials) {
-       //                 sh('docker push $registry/nodemongoapp:6.0') 
-       //             } 
-        //        }
-       //     }
-    //    }
+       stage('Deploy to Nexus') {
+           steps {
+               script {
+                    Push Docker image to Nexus registry
+                   docker.withRegistry("http://"+registry, registryCredentials) {
+                       sh('docker push $registry/nodemongoapp:6.0') 
+                   } 
+               }
+           }
+       }
 
         stage('Run application') {
             steps {
