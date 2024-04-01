@@ -17,7 +17,7 @@ pipeline {
         stage('Remove node_modules') {
             steps {
                 script {
-                    sh 'find /var/lib/jenkins/workspace/node-pipeline -name "node_modules" -type d -prune -exec rm -rf {} +'
+                    sh 'find /var/lib/jenkins/workspace/pipeline_pi -name "node_modules" -type d -prune -exec rm -rf {} +'
                 }
             }
         }
