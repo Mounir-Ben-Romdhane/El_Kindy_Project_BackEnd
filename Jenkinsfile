@@ -93,7 +93,7 @@ pipeline {
        stage('Deploy to Nexus') {
            steps {
                script {
-                    Push Docker image to Nexus registry
+                   // Push Docker image to Nexus registry
                    docker.withRegistry("http://"+registry, registryCredentials) {
                        sh('docker push $registry/nodemongoapp:6.0') 
                    } 
@@ -136,12 +136,12 @@ pipeline {
         success {
             emailext attachLog: true, subject: 'Pipeline Successful',
                       body: 'Your pipeline has completed successfully.',
-                      to: 'your-email@example.com'
+                      to: 'mounirbenben9@gmail.com'
         }
         failure {
             emailext attachLog: true, subject: 'Pipeline Failed',
                       body: 'Your pipeline has failed. Please check the logs for details.',
-                      to: 'your-email@example.com'
+                      to: 'mounirbenben9@gmail.com'
         }
     }
     
