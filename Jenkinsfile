@@ -49,7 +49,7 @@ pipeline {
                 script { 
                     def scannerHome = tool 'sonar' 
                     withSonarQubeEnv { 
-                        sh "${scannerHome}/bin/sonar-scanner" 
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=nodeapp" 
                     } 
                 } 
             } 
