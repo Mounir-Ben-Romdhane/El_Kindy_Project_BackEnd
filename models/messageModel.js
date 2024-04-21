@@ -13,7 +13,8 @@ const MessageSchema = new mongoose.Schema(
     },
     picturePath: {
       type: String,
-    }
+    },
+    paymentId: { type: String },
   },
   {
     timestamps: true,

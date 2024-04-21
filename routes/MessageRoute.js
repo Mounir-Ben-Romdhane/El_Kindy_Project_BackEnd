@@ -6,6 +6,6 @@ const router = express.Router();
 
 //router.post('/', addMessage);
 
-router.get('/:chatId', verifyToken, getMessages);
+router.get('/:chatId', getMessages);
 
 export default router

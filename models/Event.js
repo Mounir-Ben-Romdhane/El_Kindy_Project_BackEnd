@@ -27,6 +27,18 @@ const eventSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+  place: {
+    type: String, 
+    required: true
+  },
+  timeFrom: {
+    type: String, 
+    required: true
+  },
+  timeTo: {
+    type: String, 
+    required: true
+  },
 }, { timestamps: true }); 
 
 const Event = mongoose.model('Event', eventSchema);

@@ -9,18 +9,18 @@ import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from "url";
 import { addNewCourse, updateCourse } from "./controllers/courseController.js";
-import { addNewEvent, updateEvent } from "./controllers/event.js";
+import { addNewEvent,updateEvent } from "./controllers/event.js";
 import  { createCategorie, updateCategorie }  from "./controllers/categorieController.js"; // Import des routes de catégorie
 import eventRoutes from "./routes/Event.js";
+import classRoute from "./routes/ClassRoutes.js";
 import salleRoutes from "./routes/salle.js";
 import inscriptionRoutes from "./routes/inscriptionRoutes.js";
 import stageRouter  from "./routes/stageRoute.js";
 import authRoutes from "./routes/auth.js";
 import courseRoute from './routes/courseRoute.js'
 import { register } from "./controllers/auth.js";
-import twilio from "twilio";
 import { addMessage } from './controllers/MessageController.js';
-
+import twilio from "twilio";
 import User from './models/User.js';
 import { users } from "./data/index.js";
 import { createStage, updateStage } from "./controllers/stageController.js";
@@ -34,8 +34,13 @@ import ChatRoute from './routes/ChatRoute.js'
 import MessageRoute from './routes/MessageRoute.js'
 import meetingRoutes from './routes/meetingRoutes.js';
 import reservationRoutes  from "./routes/Reservation.js";
+
+import paymentRouter from "./routes/paymentRouter.js";
+
+
 import planningRoutes from "./routes/planningRoutes.js";
 
+import ReservationStage from "./routes/ReservationStage.js";
 /* CONFIGURATION */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,7 +55,7 @@ app.use(bodyParser.json({limit: "30mb", extended: true}));
 app.use(bodyParser.urlencoded({limit: "30mb", extended: true}));
 // Configure CORS to allow requests from http://localhost:3000
 app.use(cors({
-    origin: ["http://localhost:3000","https://el-kindy.vercel.app"],
+    origin: ["http://localhost:3000","https://el-kindy.vercel.app","https://lh3.googleusercontent.com","http://localhost:3001"],
     credentials: true // Include credentials in CORS request
   }));
 app.use("/assets", express.static(path.join(__dirname,'public/assets')));
@@ -75,6 +80,7 @@ app.post("/event/add",upload.single("picture"),addNewEvent);
 app.patch("/event/update/:id",upload.single("picture"),updateEvent);
 app.use("/planning", planningRoutes);
 
+
 app.post("/api/categories", upload.single("picture"), createCategorie);
 app.put("/api/categories/:id", upload.single("picture"), updateCategorie);
 
@@ -82,6 +88,8 @@ app.post("/api/stage", upload.single("picture"), createStage);
 app.patch("/api/stage/:id", upload.single("picture"),updateStage );
 
 app.post("/addMessage", upload.single("picture"), addMessage);
+
+
 
 /*Twilio */
 dotenv.config();
@@ -100,20 +108,28 @@ export const sendSms = (toPhoneNumber) => {
 };
 
 
+
+/* ROUTES */
+
+
 /* ROUTES */
 app.use("/auth",authRoutes);
 app.use("/api/categories", categorieRoutes); 
 app.use("/stage",stageRouter);
+app.use('/classes', classRoute);
 app.use('/event', eventRoutes);
 app.use("/course",courseRoute);
 app.use("/salle",salleRoutes);
 app.use("/inscription", inscriptionRoutes);
-
 app.use('/chat', ChatRoute);
 app.use('/message', MessageRoute);
 app.use('/meeting', meetingRoutes);
 app.use("/events",reservationRoutes);
 
+app.use("/payment",paymentRouter);
+
+
+app.use("/reservationstage", ReservationStage);
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
 mongoose.connect(process.env.MONGO_URL, {

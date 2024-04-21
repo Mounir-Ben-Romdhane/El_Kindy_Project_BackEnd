@@ -17,17 +17,20 @@ const planningSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Room', 
   },
-  // Modifier pour référencer le modèle User pour les enseignants
   teacherId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Assurez-vous que ceci correspond à votre modèle d'utilisateur
+    ref: 'User', // Référence au modèle User pour les enseignants
   },
-  // Modifier pour référencer le modèle User pour les étudiants
   studentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Assurez-vous que ceci correspond à votre modèle d'utilisateur
+    ref: 'User', // Référence au modèle User pour les étudiants
+  },
+  classId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Classe', // Référence à la classe
   },
 });
+
 
 const Planning = mongoose.model("Planning", planningSchema);
 

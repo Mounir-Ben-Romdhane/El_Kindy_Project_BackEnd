@@ -1,16 +1,17 @@
 import mongoose from "mongoose";
 
 const reservationSchema = new mongoose.Schema({
-  eventId: { type: mongoose.Schema.Types.ObjectId, ref: "Event" },
-  userName: { type: String, required: true },
-  userEmail: { type: String, required: true },
-  phoneNumber: { type: Number, required: true },
-  reservationDate: { type: Date, default: Date.now },
+  eventId: { type: mongoose.Schema.Types.ObjectId, ref: "Event" },  
+  userName: { type: String, required: true },                      
+  userEmail: { type: String, required: true },                     
+  phoneNumber: { type: Number, required: true },                   
+  reservationDate: { type: Date, default: Date.now },              
   status: { 
     type: String,  
-    enum: ['pending', 'accepted', 'refused'], 
+    enum: ['pending', 'accepted', 'refused'],                      
     default: 'pending' 
   },
+  paymentId: { type: String }                                      // Payment ID from payment gateway
 });
 
 const Reservation = mongoose.model("Reservation", reservationSchema);

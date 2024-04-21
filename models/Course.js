@@ -23,7 +23,6 @@ const CourseSchema = new mongoose.Schema(
         courseCategory: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Categorie',
-            default: ""
         },
         courseLevel: {
             type: String,
