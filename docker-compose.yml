@@ -15,11 +15,11 @@ services:
 
   app:
     build: .
-    image: 192.168.1.4:8083/nodemongoapp2:6.0
+    image: 172.20.10.2:8083/nodemongoapp:6.0
     restart: always
     container_name: back
     ports:
-      - '5000:5000'
+      - '3001:3001'
     depends_on:
       - db
 volumes:
