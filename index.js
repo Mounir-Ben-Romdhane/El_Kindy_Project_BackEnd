@@ -5,6 +5,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
 import helmet from 'helmet';
+import textAnalytics from "./routes/textAnalytics.js";
+
 import morgan from 'morgan';
 import gradeRoutes from "./routes/gradeRoutes.js";
 import path from 'path';
