@@ -1,7 +1,11 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import Classe from "../models/ClassModel.js";
 import { sendEmail } from '../utils/sendMailer.js';
+import speakeasy from "speakeasy";
+import Assignment from "../models/Assignment.js";
+import Course from "../models/Course.js";
 
 /* REGISTER USER */
 export const register = async (req, res) => {
@@ -43,23 +47,24 @@ export const register = async (req, res) => {
 
 /* LOGGING IN */
 export const login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email: email });
-        const isMatch = await bcrypt.compare(password, user.password);
+  try {
+      const { email, password, tokens } = req.body;
+      const user = await User.findOne({ email: email });
+      const isMatch = await bcrypt.compare(password, user.password);
 
-        if(!user || !isMatch) return res.status(400).json({ message: "Email or password not match !" });
+      if (!user || !isMatch) return res.status(400).json({ message: "Email or password not match !" });
+
 
         
         //if (!isMatch) return res.status(400).json({ msg: "Invalid credentials." });
+
         // Generate refresh token
         const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
         user.refreshToken = refreshToken;
         await user.save();
 
         const accessToken = jwt.sign({ id: user._id, fullName: user.firstName + " " + user.lastName,
-         roles: user.roles,  email : user.email, picturePath: user.picturePath, authSource: user.authSource, gender: user.gender }, process.env.JWT_SECRET, {expiresIn:"30m"});
-        
+        roles: user.roles,  email : user.email, picturePath: user.picturePath, authSource: user.authSource, gender: user.gender  }, process.env.JWT_SECRET, {expiresIn:"10m"});
      
 
         if(!user.verified) {
@@ -163,12 +168,31 @@ export const login = async (req, res) => {
             return res.status(401).json({status: false, message: "An email sent to your account ! please verify !"});
         }
 
+        // Check if TwoFactorAuthentication is enabled for the user
+        
+        
+        if (user.TwoFactorAuthentication) {
+          // Verify the user's token
+          const verified = speakeasy.totp.verify({
+            secret: user.secret,
+            encoding: 'base32',
+            token: tokens,
+            window: 1,
+          });
+
+          if (!verified) {
+            return res.status(401).json({ error: 'Invalid token for 2FA' });
+          }
+        }
+
+       
         delete user.password;
         res.status(200).json({ accessToken, refreshToken: user.refreshToken });
     }catch (err) {
         res.status(500).json({ error: err.message });
     }
 }
+
 
 export const refreshToken = async (req, res) => {
     try {
@@ -187,8 +211,8 @@ export const refreshToken = async (req, res) => {
        
 
         const accessToken = jwt.sign({ id: user._id, fullName: user.firstName + " " + user.lastName,
-
-        roles: user.roles,  email : user.email, picturePath : user.picturePath  }, process.env.JWT_SECRET, { expiresIn: "30s" });
+        roles: user.roles,  email : user.email, picturePath: user.picturePath, authSource: user.authSource, gender: user.gender  }, process.env.JWT_SECRET, {expiresIn:"10m"});
+     
 
         res.json({ accessToken });
     } catch (error) {
@@ -298,7 +322,7 @@ export const getUserById = async (req, res) => {
     const user = await User.findById(id);
     if (user) {
 
-      res.status(200).json(user);
+      res.status(200).json({user});
     } else {
       res.status(404).json("No such User");
     }
@@ -321,6 +345,7 @@ export const getTeacherById = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
 //Get all User by Role
 export const getAllUserByRole = async (req, res) => {
   const role = req.params.role;
@@ -335,7 +360,7 @@ export const getAllUserByRole = async (req, res) => {
           // For other roles, determine the fields to populate
           let populateFields = '';
           if (role === 'teacher') {
-              populateFields = 'teacherInfo.coursesTaught teacherInfo.classesTeaching';
+              populateFields = 'teacherInfo.coursesTaught teacherInfo.classesTeaching teacherInfo.studentsTaught';
           } else if (role === 'student') {
               populateFields = 'studentInfo.classLevel studentInfo.coursesEnrolled';
           }
@@ -349,6 +374,7 @@ export const getAllUserByRole = async (req, res) => {
       res.status(500).json(error);
   }
 };
+
 
 
 
@@ -371,6 +397,199 @@ export const getStudents = async (req, res) => {
       res.status(500).json({ message: error.message });
   }
 };
+export const getStudentById = async (req, res) => {
+  const studentId = req.params.studentId;
+  try {
+      const student = await User.findById(studentId); // Recherchez l'étudiant par son ID dans la base de données
+      if (!student) {
+        // Si aucun étudiant n'est trouvé avec cet ID, renvoyez une réponse 404 (Not Found)
+        return res.status(404).json({ message: 'Student not found' });
+      }
+      // Si un étudiant est trouvé, renvoyez ses détails dans la réponse
+      res.status(200).json(student);
+  } catch (error) {
+      // Si une erreur se produit pendant la recherche, renvoyez une réponse 500 (Internal Server Error)
+      res.status(500).json({ message: error.message });
+  }
+};
+export const getAssignmentsByCourseIdForStudent = async (req, res) => {
+  try {
+    // Pas besoin de convertir studentId en ObjectId
+    const studentId = req.params.studentId;
+    const courseIds = req.params.courseId.split(','); // Diviser la chaîne en un tableau d'identifiants de cours
+ 
+    // Trouver l'utilisateur dans la base de données
+    const user = await User.findById(studentId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+ 
+    // Vérifier que l'utilisateur est un étudiant
+    if (!user.roles.includes('student')) {
+      return res.status(403).json({ error: 'User is not a student' });
+    }
+ 
+    // Rechercher les affectations correspondant aux ID des cours
+    const assignments = await Assignment.find({ courseId: { $in: courseIds } });
+    
+    // Renvoyer les affectations trouvées sous forme de réponse JSON
+    res.json(assignments);
+  } catch (error) {
+    console.error('Error fetching assignments by course ID for student:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+ };
+
+ export const getCoursesByStudentId = async (req, res) => {
+  const studentId = req.params.studentId;
+ 
+  try {
+    const user = await User.findById(studentId);
+    if (!user) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+ 
+    const courses = user.studentInfo.coursesEnrolled;
+ 
+    if (courses.length > 0) {
+      // Utiliser une méthode de projection pour retourner uniquement l'ID et le nom du cours
+      const coursesWithNames = await Course.find({ _id: { $in: courses } }, { _id: 1, title: 1 });
+      return res.status(200).json(coursesWithNames);
+    } else {
+      return res.status(404).json({ message: "No courses found for this student" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+ };
+ export const getClassByStudent = async (req, res) => {
+   const studentId = req.params.studentId;
+ 
+   try {
+       const student = await User.findById(studentId).populate('studentInfo.classLevel');
+       res.status(200).json(student.studentInfo.classLevel);
+   } catch (error) {
+       res.status(500).json({ message: error.message });
+   }
+ };// FUNCTION TO GET THE CLASSES TAUGHT BY A TEACHER
+ export const getClassesTaughtByTeacher = async (req, res) => {
+   const teacherId = req.params.teacherId;
+ 
+   try {
+       const teacher = await User.findById(teacherId).populate('teacherInfo.classesTeaching');
+       res.status(200).json(teacher.teacherInfo.classesTeaching);
+   } catch (error) {
+       res.status(500).json({ message: error.message });
+   }
+ };
+ // get courses by student
+export const getCoursesByStudent = async (req, res) => {
+  const studentId = req.params.studentId;
+
+  try {
+      const student = await User.findById(studentId).populate('studentInfo.coursesEnrolled');
+      res.status(200).json(student.studentInfo.coursesEnrolled);  
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+};
+//get Courses Taught By Teacher
+export const getCoursesTaughtByTeacher = async (req, res) => {
+  const teacherId = req.params.teacherId;
+
+  try {
+      const teacher = await User.findById(teacherId).populate('teacherInfo.coursesTaught');
+      res.status(200).json(teacher.teacherInfo.coursesTaught);
+  } catch (error) {   
+      res.status(500).json({ message: error.message });
+  }
+};
+// Function to get the list of courses in a class taught by a teacher getCoursesTaughtByTeacherInClass
+export const getCoursesTaughtByTeacherInClass = async (req, res) => {
+  const { teacherId, classId } = req.params;
+
+  try {
+    // Find the teacher by ID and populate their coursesTaught
+    const teacher = await User.findById(teacherId).populate('teacherInfo.coursesTaught');
+
+    // Check if teacher or teacherInfo is null or empty coursesTaught array is empty  
+    if (!teacher || !teacher.teacherInfo || !teacher.teacherInfo.coursesTaught.length) {
+      return res.status(404).json({ error: "Teacher not found or missing coursesTaught." });
+    }
+
+    // Find the class by ID and populate its courses
+    const classe = await Classe.findById(classId).populate('courses');
+
+    // Extract the courses taught by the teacher
+    const teacherCourses = teacher.teacherInfo.coursesTaught.map(course => course._id.toString());
+
+    // Filter the courses in the class by those taught by the teacher and return the list of courses taught by the teacher in the class 
+    const coursesTaughtByTeacherInClass = classe.courses.filter(course =>
+      teacherCourses.includes(course._id.toString())
+    );
+
+    res.json(coursesTaughtByTeacherInClass);
+  } catch (error) {
+    console.error("Error fetching courses taught by teacher in class:", error);
+    res.status(500).json({ error: "Failed to fetch courses taught by teacher in class." });
+  } 
+
+}
+
+//get students by class 
+export const getStudentsEnrolledInClass = async (req, res) => {
+  const classId = req.params.classId;
+
+  try {
+      const students = await User.find({ roles: 'student', 'studentInfo.classLevel': classId });
+      res.status(200).json(students);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+};
+//i wanta function to get the students enrolled in a class and in a specific course
+export const getStudentsInClassByCourseAndClass = async (req, res) => {
+  const { classId, courseId } = req.params;
+
+  try {
+    // Find the students enrolled in the class
+    const students = await User.find({ roles: 'student', 'studentInfo.classLevel': classId });
+
+    // Filter the students by those enrolled in the provided course
+    const studentsByCourse = students.filter(student =>
+      student.studentInfo.coursesEnrolled.includes(courseId)
+    );
+
+    res.status(200).json(studentsByCourse);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 
 
+//get classes and students not inrolled in class by courrse and teacher 
+
+export const getClassesAndStudentsNotEnrolledInClassByCourseAndTeacher = async (req, res) => {
+  const { courseId, teacherId } = req.params;
+
+  try {
+    const teacher = await User.findById(teacherId).populate('teacherInfo.studentsTaught');
+    const studentsTaught = teacher.teacherInfo.studentsTaught;
+    const classesTaught = teacher.teacherInfo.classesTeaching.map(classe => classe._id.toString());
+    const classesTaughtObjects = await Classe.find({ _id: { $in: classesTaught } });
+
+    // Find students enrolled in the course
+    const studentsEnrolled = await User.find({
+      roles: 'student',
+      'studentInfo.coursesEnrolled': courseId
+    });
+
+    // Filter out students who are already assigned to a class
+    const studentsNotInClass = studentsEnrolled.filter(student => !student.studentInfo.classLevel);
+
+    res.status(200).json({ classesTaught: classesTaughtObjects, studentsEnrolled: studentsTaught });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

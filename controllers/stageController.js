@@ -12,7 +12,9 @@ export const createStage = async (req, res) => {
             startDate,
             finishDate,
             description,
-            picturePath
+            picturePath,
+            place,
+            price
         } = req.body;
 
         const newStage = new Stage({
@@ -20,7 +22,9 @@ export const createStage = async (req, res) => {
             startDate,
             finishDate,
             description,
-            picturePath
+            picturePath,
+            place,
+            price
         });
 
         const savedStage = await newStage.save();

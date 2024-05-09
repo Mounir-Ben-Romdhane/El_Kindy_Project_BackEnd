@@ -25,6 +25,13 @@ const StageSchema = new mongoose.Schema(
         picturePath: {
             type: String,
             required: true
+        },
+        place:{
+            type:Number,
+            required:true,
+        },
+        price: {
+          type: Number,
         }
     },
     { timestamps: true}

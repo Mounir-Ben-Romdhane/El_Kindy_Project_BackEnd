@@ -3,7 +3,7 @@ import cron from 'node-cron';
 
 const deleteExpiredMeetings = async () => {
   try {
-    console.log('Suppression des réunions expirées...');
+   // console.log('Suppression des réunions expirées...');
     const currentDate = new Date();
 
     const result = await Meeting.deleteMany({
@@ -14,10 +14,10 @@ const deleteExpiredMeetings = async () => {
       ]
     });
 
-    console.log('Résultat de la suppression des réunions :', result);
-    console.log('Réunions expirées supprimées avec succès.');
+    //console.log('Résultat de la suppression des réunions :', result);
+    //console.log('Réunions expirées supprimées avec succès.');
   } catch (error) {
-    console.error('Erreur lors de la suppression des réunions expirées :', error.message);
+   // console.error('Erreur lors de la suppression des réunions expirées :', error.message);
   }
 };
 
@@ -25,14 +25,14 @@ const deleteExpiredMeetings = async () => {
 // Tâche cron
 cron.schedule('* * * * *', async () => {
   try {
-    console.log('Tâche cron démarrée à :', new Date());
+   // console.log('Tâche cron démarrée à :', new Date());
     
     // Appeler la fonction pour supprimer les réunions expirées
     await deleteExpiredMeetings();
 
-    console.log('Tâche cron terminée avec succès.');
+   // console.log('Tâche cron terminée avec succès.');
   } catch (error) {
-    console.error('Erreur dans la tâche cron :', error.message);
+  //  console.error('Erreur dans la tâche cron :', error.message);
   }
 });
 // Ajouter une nouvelle réunion

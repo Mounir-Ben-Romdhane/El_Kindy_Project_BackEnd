@@ -2,13 +2,28 @@ import Classe from '../models/ClassModel.js';
 
 export const createClass = async (req, res) => {
   try {
-    const { className, capacity, ordre } = req.body;
-    const newClass = await Classe.create({ className, capacity, ordre });
+    const { className, capacity, ordre, courses } = req.body;
+
+    const newClass = await Classe.create({ className, capacity, ordre, courses });
     res.status(201).json(newClass);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+export const updateClass = async (req, res) => {
+  try {
+    const { classId } = req.params;
+    const updateData = req.body;
+    const updatedClass = await Classe.findByIdAndUpdate(classId, updateData, { new: true });
+    res.status(200).json(updatedClass);
+    //console.log(updateData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 export const getAllClasses = async (req, res) => {
   try {
@@ -30,17 +45,6 @@ export const getClasseById = async (req, res) => {
     res.status(200).json(classe);
   } catch (error) {
     res.status(400).json({ message: error.message });
-  }
-};
-
-export const updateClass = async (req, res) => {
-  try {
-    const { classId } = req.params;
-    const updateData = req.body;
-    const updatedClass = await Classe.findByIdAndUpdate(classId, updateData, { new: true });
-    res.status(200).json(updatedClass);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
 };
 

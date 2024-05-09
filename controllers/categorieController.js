@@ -25,24 +25,8 @@ export const getAllCategories = async (req, res) => {
 export const updateCategorie = async (req, res) => {
     try {
         const { id } = req.params;
-        let updateData = req.body; // Assuming req.body contains the fields to update
+        const updatedCategorie = await Categorie.findByIdAndUpdate(id, { $set: req.body }, { new: true });
 
-        // Log the received file data
-        console.log("Received file:", req.file);
-
-        // If a file is uploaded, add its path to updateData
-        if (req.file) {
-            console.log("File path:", req.file.path);
-            // Remove the 'public/assets/' prefix from the file path
-            updateData.picturePath = req.file.path.replace('public/assets/', '');
-        }
-        
-        // Log the updateData to verify its content
-        console.log("Update data:", updateData);
-
-        // Update the category with the given ID
-        const updatedCategorie = await Categorie.findByIdAndUpdate(id, updateData, { new: true });
-       
         if (!updatedCategorie) {
             return res.status(404).json({ success: false, error: "Categorie not found." });
         }

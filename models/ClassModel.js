@@ -4,7 +4,6 @@ const classSchema = new mongoose.Schema(
   {
     className: {
       type: String,
-      required: true,
       unique: true,
     },
     capacity: {
@@ -16,11 +15,25 @@ const classSchema = new mongoose.Schema(
       required: [true, 'Order is required.'],
       unique: true, // Ensure ordre is unique
     },
+
+    courses: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course', // Référence au modèle Course
+      },
+    ],
   },
   {
     strictPopulate: false, // Allow populating fields not defined in the schema
   }
 );
+
+classSchema.virtual('students', {
+  ref: 'User', // Reference the User model
+  localField: '_id',
+  foreignField: 'studentInfo.classLevel',
+  justOne: false, // Allow multiple students to be populated
+});
 
 const Classe = mongoose.model('Classe', classSchema);
 

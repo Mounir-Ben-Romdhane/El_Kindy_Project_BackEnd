@@ -1,0 +1,286 @@
+{
+  "first Name": {
+    "kind": "string",
+    "value": "amal",
+    "boundingRegions": [
+      {
+        "pageNumber": 1,
+        "polygon": [
+          {
+            "x": 383,
+            "y": 752
+          },
+          {
+            "x": 488,
+            "y": 751
+          },
+          {
+            "x": 488,
+            "y": 788
+          },
+          {
+            "x": 383,
+            "y": 789
+          }
+        ]
+      }
+    ],
+    "content": "amal",
+    "spans": [
+      {
+        "offset": 87,
+        "length": 4
+      }
+    ],
+    "confidence": 0.82
+  },
+  "last Name": {
+    "kind": "string",
+    "value": "jomaa",
+    "boundingRegions": [
+      {
+        "pageNumber": 1,
+        "polygon": [
+          {
+            "x": 376,
+            "y": 859
+          },
+          {
+            "x": 508,
+            "y": 859
+          },
+          {
+            "x": 508,
+            "y": 906
+          },
+          {
+            "x": 376,
+            "y": 906
+          }
+        ]
+      }
+    ],
+    "content": "jomaa",
+    "spans": [
+      {
+        "offset": 104,
+        "length": 5
+      }
+    ],
+    "confidence": 0.899
+  },
+  "Email": {
+    "kind": "string",
+    "value": "amaljomaa@gmail.com",
+    "boundingRegions": [
+      {
+        "pageNumber": 1,
+        "polygon": [
+          {
+            "x": 286,
+            "y": 969
+          },
+          {
+            "x": 760,
+            "y": 970
+          },
+          {
+            "x": 760,
+            "y": 1015
+          },
+          {
+            "x": 286,
+            "y": 1014
+          }
+        ]
+      }
+    ],
+    "content": "amaljomaa@gmail.com",
+    "spans": [
+      {
+        "offset": 118,
+        "length": 19
+      }
+    ],
+    "confidence": 0.689
+  },
+  "Date of Birth": {
+    "kind": "string",
+    "value": "10-08-2000",
+    "boundingRegions": [
+      {
+        "pageNumber": 1,
+        "polygon": [
+          {
+            "x": 425,
+            "y": 1079
+          },
+          {
+            "x": 660,
+            "y": 1078
+          },
+          {
+            "x": 660,
+            "y": 1119
+          },
+          {
+            "x": 425,
+            "y": 1120
+          }
+        ]
+      }
+    ],
+    "content": "10-08-2000",
+    "spans": [
+      {
+        "offset": 154,
+        "length": 10
+      }
+    ],
+    "confidence": 0.857
+  },
+  "Addresse": {
+    "kind": "string",
+    "value": "ben arous",
+    "boundingRegions": [
+      {
+        "pageNumber": 1,
+        "polygon": [
+          {
+            "x": 362,
+            "y": 1190
+          },
+          {
+            "x": 565,
+            "y": 1192
+          },
+          {
+            "x": 565,
+            "y": 1230
+          },
+          {
+            "x": 362,
+            "y": 1228
+          }
+        ]
+      }
+    ],
+    "content": "ben arous",
+    "spans": [
+      {
+        "offset": 176,
+        "length": 9
+      }
+    ],
+    "confidence": 0.867
+  },
+  "Gender": {
+    "kind": "string",
+    "value": "Male",
+    "boundingRegions": [
+      {
+        "pageNumber": 1,
+        "polygon": [
+          {
+            "x": 323,
+            "y": 1309
+          },
+          {
+            "x": 415,
+            "y": 1309
+          },
+          {
+            "x": 415,
+            "y": 1346
+          },
+          {
+            "x": 323,
+            "y": 1346
+          }
+        ]
+      }
+    ],
+    "content": "Male",
+    "spans": [
+      {
+        "offset": 195,
+        "length": 4
+      }
+    ],
+    "confidence": 0.957
+  },
+  "Phone Number 1": {
+    "kind": "string",
+    "value": "9999999",
+    "boundingRegions": [
+      {
+        "pageNumber": 1,
+        "polygon": [
+          {
+            "x": 513,
+            "y": 1415
+          },
+          {
+            "x": 687,
+            "y": 1414
+          },
+          {
+            "x": 687,
+            "y": 1457
+          },
+          {
+            "x": 513,
+            "y": 1458
+          }
+        ]
+      }
+    ],
+    "content": "9999999",
+    "spans": [
+      {
+        "offset": 217,
+        "length": 7
+      }
+    ],
+    "confidence": 0.825
+  },
+  "Phone Number 2": {
+    "kind": "string",
+    "value": "99400447",
+    "boundingRegions": [
+      {
+        "pageNumber": 1,
+        "polygon": [
+          {
+            "x": 497,
+            "y": 1528
+          },
+          {
+            "x": 692,
+            "y": 1527
+          },
+          {
+            "x": 692,
+            "y": 1567
+          },
+          {
+            "x": 497,
+            "y": 1568
+          }
+        ]
+      }
+    ],
+    "content": "99400447",
+    "spans": [
+      {
+        "offset": 241,
+        "length": 8
+      }
+    ],
+    "confidence": 0.792
+  },
+  "VendorName": {
+    "kind": "string",
+    "confidence": 0.937
+  }
+}

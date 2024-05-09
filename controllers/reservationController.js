@@ -2,36 +2,67 @@ import Reservation from "../models/Reservation.js";
 import Event from "../models/Event.js";
 import { sendSms } from "../index.js"
 import axios from 'axios';
+
 import { generateInvoice } from './Pdf.js';
 
-
-
-
-
 export const createReservation = async (req, res) => {
-  console.log("Initiating reservation:", req.params, req.body);
+  console.log("initiatePaymentAndCreateReservation hit", req.params, req.body); 
   const { eventId } = req.params;
-  const { userName, userEmail, phoneNumber } = req.body;
+  const { userName, userEmail, phoneNumber,numberOfReservations } = req.body;
 
   try {
+    // Get event details to determine the price
     const eventDetails = await Event.findById(eventId);
+    console.log("event price : ",eventDetails.price);
+    
     if (!eventDetails) {
       return res.status(404).json({ message: "Event not found" });
     }
-    console.log("Event price:", eventDetails.price);
 
+    // Check if the event is free
     if (!eventDetails.price) {
-      const newReservation = new Reservation({ eventId, userName, userEmail, phoneNumber });
+      // If event is free, create reservation directly
+      const newReservation = new Reservation({
+        eventId,
+        userName,
+        userEmail,
+        phoneNumber,
+        numberOfReservations,
+      });
       const savedReservation = await newReservation.save();
       return res.status(201).json({ reservation: savedReservation });
     }
+    
+    // If event is paid, generate payment link
 
-    const amountinMillimes = eventDetails.price * 1000;
-    const paymentPayload = { amount: amountinMillimes };
+    // Calculate payment amount based on event price and numberOfReservations
 
+    const eventPrice = parseFloat(eventDetails.price); 
+
+    // Check for NaN (Not a Number) in the parsed event price
+    if (isNaN(eventPrice)) {
+  throw new Error("Invalid event price. Please check the data source.");
+  }
+
+  // Parse the number of reservations with base 10 and validate
+const numReservations = parseInt(numberOfReservations, 10);
+if (isNaN(numReservations)) {
+    throw new Error("Invalid number of reservations. Please check the input.");
+}
+
+    const amountInMillimes = eventPrice * 1000 * numReservations; 
+
+    console.log("Event Price:", eventPrice); // Should match expected event price
+  console.log("Number of Reservations:", numReservations); // Should match expected count
+  console.log("Amount in Millimes:", amountInMillimes); // Should reflect correct calculation
+    // Prepare payment payload including numberOfReservations
+    const paymentPayload = { amount: amountInMillimes };
+
+    // Make payment request
     axios.post('http://localhost:3001/payment/payment', paymentPayload)
       .then(paymentResponse => {
         console.log("Payment link generated:", paymentResponse.data.result.developer_tracking_id);
+        // Redirect to payment link
         res.redirect(paymentResponse.data.result.link);
       })
       .catch(paymentError => {
@@ -46,17 +77,30 @@ export const createReservation = async (req, res) => {
 
 
 
-
-
 export const listReservationsByid = async (req, res) => {
   const { eventId } = req.params;
-  try{
-    const reservation = await Reservation.find({ eventId });
-    res.json(reservation);
-  }catch{
-    res.status(500).send({ message: "Error fetching reservation", error: error.message });
+
+  if (!eventId) {
+    return res.status(400).json({ message: "Event ID is required" });
   }
-}
+
+  try {
+    // Fetch reservations for the specified event and populate the event details
+    const reservations = await Reservation.find({ eventId }).populate('eventId');
+
+    if (reservations.length === 0) {
+      return res.status(404).json({ message: "No reservations found for this event" });
+    }
+
+    res.status(200).json(reservations);
+  } catch (error) {
+    console.error("Error fetching reservations by event ID:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
 
 // Get All Events
 export const listReservations = async (req, res) => {
@@ -76,6 +120,10 @@ export const listReservations = async (req, res) => {
 }
 
 
+
+
+
+
 export const updateReservationStatus = async (req, res) => {
   const { reservationId } = req.params;
   const { status } = req.body;
@@ -92,33 +140,12 @@ export const updateReservationStatus = async (req, res) => {
     }
 
     if (status === 'accepted') {
-      // Fetch event details here
-      const eventDetails = await Event.findById(updatedReservation.eventId);
-      if (!eventDetails) {
-        return res.status(404).json({ message: "Event not found" });
-      }
-
-      
       sendSms(updatedReservation.phoneNumber).then(() => {
           console.log("SMS notification sent.");
       }).catch(err => {
           console.error("Failed to send SMS notification:", err);
       });
-
-      generateInvoice({
-        eventName: eventDetails.name,
-        eventDate: eventDetails.date.toString(),
-        userName: updatedReservation.userName,
-        userEmail: updatedReservation.userEmail,
-        price: eventDetails.price
-      }).then(filePath => {
-        // Assuming sendInvoiceEmail function is properly defined elsewhere or imported
-        sendInvoiceEmail(updatedReservation.userEmail, filePath)
-          .then(() => console.log("Invoice emailed successfully."))
-          .catch(err => console.error("Error sending invoice email:", err));
-      }).catch(err => console.error("Error generating invoice:", err)); 
-    }
-
+  }
 
     res.json(updatedReservation);
   } catch (error) {
@@ -127,5 +154,16 @@ export const updateReservationStatus = async (req, res) => {
   }
 };
 
-
-
+export const deleteReservation = async (req, res) => {
+  const { reservationId } = req.params;
+  try {
+    const deletedReservation = await Reservation.findByIdAndDelete(reservationId);
+    if (!deletedReservation) {
+      return res.status(404).json({ message: "Reservation not found." });
+    }
+    res.status(200).json({ message: "Reservation deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting reservation:", error);
+    res.status(500).json({ message: "Error deleting reservation", error: error.message });
+  }
+};

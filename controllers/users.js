@@ -2,6 +2,8 @@ import User from "../models/User.js"; // Import the User model
 import bcrypt from "bcryptjs";
 import { sendEmail } from '../utils/sendMailer.js';
 import jwt from "jsonwebtoken";
+import speakeasy from 'speakeasy';
+import QRCode from 'qrcode';
 
 
 
@@ -15,6 +17,7 @@ const addTeacher = async (req, res) => {
           password, 
           coursesTaught, 
           classesTeaching, // Updated field name
+          studentsTaught,
           dateOfBirth, 
           address, 
           gender, 
@@ -28,6 +31,14 @@ const addTeacher = async (req, res) => {
       const saltRounds = 10;
       const salt = await bcrypt.genSalt(saltRounds);
       const passwordHash = await bcrypt.hash(password, salt);
+
+      // Check if a user with the same email already exists
+      const existingUser = await User.findOne({ email });
+
+      // If a user with the same email already exists, return a status indicating that the email is already in use
+      if (existingUser) {
+          return res.status(400).json({ message: 'Email already exists' });
+      }
 
       // Create a new user with the role of 'teacher' and provided details
       const newTeacher = new User({
@@ -47,6 +58,7 @@ const addTeacher = async (req, res) => {
           teacherInfo: {
               coursesTaught,
               classesTeaching, // Updated field name
+              studentsTaught,
               qualifications,
               experienceYears
           }
@@ -184,10 +196,13 @@ const addStudentAndParent = async (req, res) => {
             parentPhone
         } = req.body;
 
-         // Check if all required fields are provided
-         if (!firstName || !lastName || !email || !password) {
-            return res.status(400).json({ error: 'All required fields must be provided' });
-        }
+         // Check if a user with the same email already exists
+    const existingUser = await User.findOne({ email: email });
+
+    // If a user with the same email already exists, return a status indicating that the email is already in use
+    if (existingUser) {
+        return res.status(400).json({ message: 'Email already exists' });
+    }
 
         const saltRounds = 10;
         const salt = await bcrypt.genSalt(saltRounds);
@@ -351,10 +366,13 @@ const addAdmin = async (req, res) => {
             // Add any additional fields here as needed
         } = req.body;
 
-        // Check if all required fields are provided
-        if (!firstName || !lastName || !email || !password) {
-            return res.status(400).json({ error: 'All required fields must be provided' });
-        }
+         // Check if a user with the same email already exists
+          const existingUser = await User.findOne({ email });
+
+          // If a user with the same email already exists, return a status indicating that the email is already in use
+          if (existingUser) {
+              return res.status(400).json({ message: 'Email already exists' });
+          }
 
         const saltRounds = 10;
         const salt = await bcrypt.genSalt(saltRounds);
@@ -516,6 +534,8 @@ const updateUser = async (req, res) => {
       userData.password = passwordHash;
     }
 
+    
+
     const updatedUser = await User.findByIdAndUpdate(userId, userData, { new: true });
     
     if (!updatedUser) {
@@ -545,6 +565,8 @@ const updateTeacher = async (req, res) => {
       teacherData.passwordDecoded = teacherData.password; // Update decoded password
       teacherData.password = passwordHash;
     }
+
+    
     
     // Update user fields
     const updatedTeacher = await User.findByIdAndUpdate(
@@ -564,6 +586,7 @@ const updateTeacher = async (req, res) => {
           'disponibilite': teacherData.disponibilite,
           'teacherInfo.coursesTaught': teacherData.coursesTaught,
           'teacherInfo.classesTeaching': teacherData.classesTeaching,
+          'teacherInfo.studentsTaught': teacherData.studentsTaught,
           'teacherInfo.qualifications': teacherData.qualifications,
           'teacherInfo.experienceYears': teacherData.experienceYears
         }
@@ -597,6 +620,7 @@ const updateStudent = async (req, res) => {
           studentData.passwordDecoded = studentData.password; // Update decoded password
           studentData.password = passwordHash;
       }
+
 
       // Update user fields
       const updatedStudent = await User.findByIdAndUpdate(
@@ -634,6 +658,8 @@ const updateStudent = async (req, res) => {
       res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
 
 
 
@@ -884,10 +910,216 @@ const unblockUser = async (req, res) => {
   }
 };
 
+const editUserProfile = async (req, res) => {
+  const userId = req.params.id;
+  const userData = req.body;
 
+  try {
+    
+    // Update user fields
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          'firstName': userData.firstName,
+          'lastName': userData.lastName,
+          'email': userData.email,
+          'dateOfBirth': userData.dateOfBirth,
+          'address': userData.address,
+          'picturePath': userData.picturePath,
+          'gender': userData.gender,
+          'phoneNumber1': userData.phoneNumber1,
+          'phoneNumber2': userData.phoneNumber2,
+          'teacherInfo.qualifications': userData.qualifications,
+          'teacherInfo.experienceYears': userData.experienceYears,
+          'studentInfo.parentName': userData.parentName,
+          'studentInfo.parentProfession': userData.parentProfession,
+          'studentInfo.parentEmail': userData.parentEmail,
+          'studentInfo.parentPhone': userData.parentPhone
+        }
+      },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const accessToken = jwt.sign({ id: user._id, fullName: user.firstName + " " + user.lastName,
+        roles: user.roles,  email : user.email, picturePath: user.picturePath, authSource: user.authSource, gender: user.gender  }, process.env.JWT_SECRET, {expiresIn:"10s"});
+     
+
+    res.status(200).json({ message: "User profile updated successfully", user: user, accessToken });
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+// Update email address
+const updateEmail = async (req, res) => {
+  const userId = req.params.id; // Assuming you have middleware to extract user ID from JWT
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { email: req.body.email },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const accessToken = jwt.sign({ id: user._id, fullName: user.firstName + " " + user.lastName,
+        roles: user.roles,  email : user.email, picturePath: user.picturePath, authSource: user.authSource, gender: user.gender  }, process.env.JWT_SECRET, {expiresIn:"10s"});
+     
+
+    res.status(200).json({ message: "Email updated successfully", user: user, accessToken });
+  } catch (error) {
+    console.error("Error updating email:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+// Update password
+const updatePassword = async (req, res) => {
+  const userId = req.params.id; // Assuming you have middleware to extract user ID from JWT
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    // Validate current password - Example code, implement your own logic
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    // Update user's password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {$set: {
+         password: hashedPassword,
+      passwordDecoded: newPassword 
+      }},
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'Password updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating password:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const updateTimeSlots = async (req, res) => {
+  const userId = req.params.id;
+  const { disponibilite } = req.body;
+
+  try {
+    // Find the user by ID and update the disponibilite field
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: { disponibilite } },
+      { new: true }
+    );
+
+    // Check if the user exists and send the updated user object in the response
+    if (updatedUser) {
+      res.json({ message: 'Time slots updated successfully', user: updatedUser });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error updating time slots:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+const ajouter2FA = async (req, res) => {
+  const { email } = req.params;
+  let qrCodeUrl; // Define qrCodeUrl outside the try block
+
+  try {
+    const secret = speakeasy.generateSecret({ length: 20 });
+    try {
+      qrCodeUrl = await new Promise((resolve, reject) => {
+        QRCode.toDataURL(secret.otpauth_url, (err, image_data) => {
+          if (err) {
+            console.error(err);
+            reject(err);
+          } else {
+            resolve(image_data);
+          }
+        });
+      });
+      console.log('qrcode', qrCodeUrl);
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+      return res.status(500).send('Internal Server Error');
+    }
+
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      {
+        TwoFactorAuthentication: true,
+        secret: secret.base32,
+        qrCode: qrCodeUrl,
+      },
+      { new: true },
+    );
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    console.log('2FA reset successful for user:',email);
+    //sendMailSecretCode2Fa(email,secret.base32);
+    res.status(200).json({ message: '2FA réinitialisé avec succès' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erreur lors de la réinitialisation du 2FA' });
+  }
+};
+
+
+// Define the route for getting teacher availability
+const getDispo = async (req, res) => {
+  try {
+    // Find all teachers with their disponibilite
+    const teachers = await User.find({ roles: "teacher" }, { disponibilite: 1 });
+
+    // Extract disponibilite from each teacher and create a combined list
+    const availabilityList = teachers.reduce((acc, teacher) => {
+      acc.push(...teacher.disponibilite);
+      return acc;
+    }, []);
+
+    // Remove duplicates from the availability list
+    const uniqueAvailabilityList = Array.from(new Set(availabilityList.map(JSON.stringify)), JSON.parse);
+
+    return res.status(200).json(uniqueAvailabilityList);
+  } catch (error) {
+    console.error("Error fetching teacher availability:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 
 
 // Export the route handler
-export { addStudentAndParent, addTeacher, addAdmin, removeUser, updateUser, updateTeacher, updateStudent,  blockUser, unblockUser };
+export { addStudentAndParent, addTeacher, addAdmin, removeUser, 
+  updateUser, updateTeacher, updateStudent,  blockUser, unblockUser,
+   editUserProfile, updateEmail, updatePassword, updateTimeSlots, ajouter2FA
+  ,getDispo };
 

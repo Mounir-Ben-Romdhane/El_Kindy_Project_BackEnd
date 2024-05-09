@@ -28,16 +28,6 @@ const CourseSchema = new mongoose.Schema(
             type: String,
             default: "Beginner"
         },
-        courseTime: {
-            type: Number,
-            default: "",
-            required: true
-        },
-        coursePrice: {
-            type: Number,
-            default: 0, 
-            required: true
-        }
     },
     { timestamps: true}
     );

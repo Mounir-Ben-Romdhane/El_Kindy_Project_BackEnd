@@ -11,7 +11,8 @@ const reservationSchema = new mongoose.Schema({
     enum: ['pending', 'accepted', 'refused'],                      
     default: 'pending' 
   },
-  paymentId: { type: String }                                      // Payment ID from payment gateway
+  paymentId: { type: String }, 
+  numberOfReservations: { type: Number, required: true, min: 1 },                                    
 });
 
 const Reservation = mongoose.model("Reservation", reservationSchema);

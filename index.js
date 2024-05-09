@@ -6,12 +6,19 @@ import dotenv from "dotenv";
 import multer from "multer";
 import helmet from 'helmet';
 import morgan from 'morgan';
+import gradeRoutes from "./routes/gradeRoutes.js";
 import path from 'path';
+import  { createShop, updateShop }  from "./controllers/ShopController.js"; // Import des routes de shop
+import shopRoute from "./routes/ShopRoute.js";
 import { fileURLToPath } from "url";
 import { addNewCourse, updateCourse } from "./controllers/courseController.js";
 import { addNewEvent,updateEvent } from "./controllers/event.js";
 import  { createCategorie, updateCategorie }  from "./controllers/categorieController.js"; // Import des routes de catégorie
 import eventRoutes from "./routes/Event.js";
+import ficheEleveRoutes from "./routes/ficheEleveRoutes.js";
+
+import assignmentRoute from "./routes/assignmentRoutes.js";
+import ContactRoutes from "./routes/ContactRoute.js"
 import classRoute from "./routes/ClassRoutes.js";
 import salleRoutes from "./routes/salle.js";
 import inscriptionRoutes from "./routes/inscriptionRoutes.js";
@@ -41,6 +48,9 @@ import paymentRouter from "./routes/paymentRouter.js";
 import planningRoutes from "./routes/planningRoutes.js";
 
 import ReservationStage from "./routes/ReservationStage.js";
+
+import { editUserProfile } from "./controllers/users.js";
+import { createAssignment, uploadAssignmentFile } from "./controllers/assignmentController.js";
 /* CONFIGURATION */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,8 +64,11 @@ app.use(morgan("common"));
 app.use(bodyParser.json({limit: "30mb", extended: true}));
 app.use(bodyParser.urlencoded({limit: "30mb", extended: true}));
 // Configure CORS to allow requests from http://localhost:3000
-app.use(cors({
-    origin: ["http://localhost:3000","https://el-kindy.vercel.app","https://lh3.googleusercontent.com","http://localhost:3001"],
+
+  app.use(cors({
+    origin: ["http://localhost:3000","https://el-kindy.vercel.app","https://lh3.googleusercontent.com",
+    "http://localhost:3001", "http://localhost:8000","https://elkindy-django-1.onrender.com",
+    "http://0.0.0.0:8000", "https://chat-elkindy.onrender.com"],
     credentials: true // Include credentials in CORS request
   }));
 app.use("/assets", express.static(path.join(__dirname,'public/assets')));
@@ -71,6 +84,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+import main from './controllers/ExtractText.js';
+
+
 /* ROUTES WITH FILES*/
 //app.post("/auth/register",upload.single("picture"),register);
 app.post("/course/add",upload.single("picture"),addNewCourse);
@@ -81,15 +97,24 @@ app.patch("/event/update/:id",upload.single("picture"),updateEvent);
 app.use("/planning", planningRoutes);
 
 
-app.post("/api/categories", upload.single("picture"), createCategorie);
-app.put("/api/categories/:id", upload.single("picture"), updateCategorie);
+app.post("/api/categories/add", verifyToken, upload.single("picture"), createCategorie);
+app.put("/api/categories/update/:id", verifyToken, upload.single("picture"), updateCategorie);
 
+app.post("/shops", upload.single("picture"), createShop);
+app.put("/shops/:id", upload.single("picture"), updateShop);
+app.use("/grades", gradeRoutes);
 app.post("/api/stage", upload.single("picture"), createStage);
 app.patch("/api/stage/:id", upload.single("picture"),updateStage );
 
 app.post("/addMessage", upload.single("picture"), addMessage);
 
 
+app.patch("/user/edit/:id", upload.single("picture"), verifyToken, editUserProfile);
+
+
+
+app.post("/api/add", upload.single("picturePath"), createAssignment);
+router.post('/api/upload/:assignmentId', upload.single('picturePath'), uploadAssignmentFile);
 
 /*Twilio */
 dotenv.config();
@@ -117,19 +142,50 @@ app.use("/auth",authRoutes);
 app.use("/api/categories", categorieRoutes); 
 app.use("/stage",stageRouter);
 app.use('/classes', classRoute);
+app.use('/shops', shopRoute);
+
 app.use('/event', eventRoutes);
 app.use("/course",courseRoute);
+
+app.use("/contact",ContactRoutes);
 app.use("/salle",salleRoutes);
 app.use("/inscription", inscriptionRoutes);
 app.use('/chat', ChatRoute);
 app.use('/message', MessageRoute);
 app.use('/meeting', meetingRoutes);
+
+app.use("/ficheEleve",ficheEleveRoutes);
 app.use("/events",reservationRoutes);
 
 app.use("/payment",paymentRouter);
 
+app.use('/api', assignmentRoute);
+
 
 app.use("/reservationstage", ReservationStage);
+
+app.post('/upload', upload.single('image'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).send('No file uploaded.');
+    }
+
+    try {
+        // Call the main function with the uploaded file path
+        await main(req.file.path);
+
+        // Respond with a success message
+        res.status(200).send('File uploaded successfully.');
+    } catch (error) {
+        console.error('Error processing file:', error);
+        res.status(500).send('Error processing file.');
+    }
+});
+
+
+
+// azure ai :
+app.use("/azure",textAnalytics);
+
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
 mongoose.connect(process.env.MONGO_URL, {

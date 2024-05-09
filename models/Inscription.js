@@ -57,9 +57,27 @@ const inscriptionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'refused'],
+    enum: ['pending', 'not paid', 'confirmed', 'refused','active'],
     default: 'pending'
+  },
+  paymentId: {
+    type: String,
+    default: ""
+  },
+  paymentLink: {
+    type: String,
+    default: ""
+  },
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'completed', 'failed'],
+    default: 'pending'
+  },
+  paymentAmount: {
+    type: Number,
+    default: 100000  // Always set to 100 DT
   }
+
 });
 
 const Inscription = mongoose.model('Inscription', inscriptionSchema);

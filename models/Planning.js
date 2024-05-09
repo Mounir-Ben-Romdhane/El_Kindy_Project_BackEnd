@@ -25,6 +25,10 @@ const planningSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', // Référence au modèle User pour les étudiants
   },
+  courseId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course', // Référence au modèle User pour les étudiants
+  },
   classId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Classe', // Référence à la classe

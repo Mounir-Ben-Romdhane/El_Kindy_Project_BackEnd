@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "bamboo-dryad-422120",
+  "private_key_id": "eaa568f474dda5c666ef04f58b2b8a167aea6591",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDQDle5M09zwxbU\nmukXDtiT+/1RF5GfBaapRIEjPpD/CPIHcdJrOlol7EojxESvHOhPa1G6lgZ2BkpT\nJ5YZPtq/+LKeaaoAH8dBUmtvORfFQkfVCd++aHlks7Q65vICxfMywuVnZhWY3+NB\nzw4cblukUTXE5UuhnJAFUWiyPfhohewiOgTnCFSkbLS7tT/mVov8GyG8RglyP2pu\nsCssjSsOGsHQenwBaoCAos2JONlyGEsmNwGxBdJNnXatocxjLBkLwDtY1LW72w70\n3kjsioPnNh/vCOstsHSPeynfkdrLa0fz4ALHv2ABDLwu59xGNSjDZ1bMHlachP4n\n7KhvTfe9AgMBAAECggEACAnofsnfkdf3AQZD56BVuDteGWzWiLU7BW2VqxXG8Wut\nj6G+C7w98RrU7yvYAYdq5xf87j96BsO4dHJiR3MZGEi/fK/AIfAYY/WPcW/cc20x\nAadiLeUIfQkVIh9740/gVSpC8ICjvfvh4nrhudx+YvYWT0ISxC7x65qud7s9kVWQ\nKVnj1+krHh1CnrtAqqS/P33blF1uj2VfeSGpu3njswLCZnNMWva88KyYP53xEkJh\ntfFOZ7gqj5ZkB3iRUpyXYdD2HTwbk2PALrmei2FKE427H+viGclJdKc0SeUITkWT\nk7pUw4r8YjN9HPTodMIO23yNwhgDqmoBEf1w31q5YQKBgQDnv6nC2996vLHsaEAQ\nIY69nQxh32Cc9ichNwntvaccjgfrMtH66mHcHGgp8nRWw95sMbq7GLFpLU660FE+\nu56xTJ+6WWhv7CMMMP1VnSsMTkKpU7JSPjYqD/qR5ddEzCfaxNnSISMv/gLZoN6Z\neQuxs4IbpaTK3gnYcsmqlHoDMQKBgQDl0/mIerRZLWY5Gl3PLcwuZDP2r8m2m5xi\npLRsqojtMrykuBNaH5nUjqubu3spK62U/CrSckI32TBtDgjgxgret0pu8tSb/6yY\nnQr/TqX4ru0Ghd7pG1loyIfCv0/FbrQVR+djqwiBgzp7XyywLIfhS8WhMewIBOEk\nH8/imHaiTQKBgQCZ48UX9yeUej7wDF4WGCKQOPxi9ZFTSYW8Ya7/JwQUSyBpB2s2\nYnOvVVG6IR0uDIzjbbZgzUnp3MM9/F0m+jGr7ITYmsxmHfk7/EANnPtcBY/wnvp3\n8IXJMqkiPuzO636/oB5Ake6qzNMZruCCK0Yfr2MDduBSMlV5XOgblNLc0QKBgQCk\nT0YJIuCpGOIKVSVYJz/gstbLuKWXnezSQTqUrd8y5aEkik2bkxghdNaPghvtNULm\nTto2lmVtFCOg8/W47R18WMIoTAdgeAvnF+9y08Go5zaiATd6pIjpduRIgQoA9sJc\nrIlrIi30meNHrKWAVnXWxptGQTCkEwj7EJtJPwMhyQKBgCl4/NNoXR08koFXemar\nzgzCzLUn7Tn/3/FZ8JcIbrAjZhNWUsY0PP0LstnJ5WZRw/Afe8uQLJCi0xplVpl2\nsOTS+2CQPf+H2HG3qjcIuN/S1GFAXyCUBuuhmD1/EFf2E+AIAj1M/yroqJgVy8aQ\nLhDh7gr9RvHz4i7rN0EA3Qgx\n-----END PRIVATE KEY-----\n",
+  "client_email": "pikindy@bamboo-dryad-422120.iam.gserviceaccount.com",
+  "client_id": "100193780582330480565",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/pikindy%40bamboo-dryad-422120.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

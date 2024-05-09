@@ -13,7 +13,9 @@ export const addNewPlanning = async (req, res) => {
       color: req.body.color,
       teacherId: req.body.teacherId, // Assurez-vous que cette ligne est présente et correcte
       studentId: req.body.studentId, // Assurez-vous que cette ligne est présente et correcte
-    //  classId: req.body.classId, // Assurez-vous que cette ligne est présente et correcte
+      courseId: req.body.courseId, // Assurez-vous que cette ligne est présente et correcte
+
+     classId: req.body.classId, // Assurez-vous que cette ligne est présente et correcte
 
     });
     

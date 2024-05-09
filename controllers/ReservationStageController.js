@@ -1,27 +1,46 @@
 import Reservation from "../models/ReservationStage.js";
-import { sendSms } from "../index.js"
+import { sendSms } from "../index.js";
+import Stage from "../models/Stage.js";
+import axios from 'axios';
 
 export const createReservation = async (req, res) => {
-  console.log("createReservation hit", req.params, req.body); 
-  const { stageId } = req.params;
-  const { userName, userEmail, phoneNumber,message } = req.body;
+  console.log("Initiating reservation:", req.params, req.body);
+  const stageId = req.params.stageId;
+  const { userName, userEmail, phoneNumber, message } = req.body;
 
-  try{
-    const newReservation = new Reservation({
-      stageId,
-      userName,
-      userEmail,
-      phoneNumber,
-      message
-    })
+  try {
+    const stageDetails = await Stage.findById(stageId);
+    if (!stageDetails) {
+      return res.status(404).json({ message: "Stage not found" });
+    }
 
-    const saveReservation =await newReservation.save();
-    res.status(201).json(saveReservation);
+    let paymentId; // Declare paymentId variable to store the generated payment ID
+
+    if (!stageDetails.price) {
+      const newReservation = new Reservation({ stageId, userName, userEmail, phoneNumber, message });
+      const savedReservation = await newReservation.save();
+      return res.status(201).json({ reservation: savedReservation });
+    } else {
+      const amountinMillimes = stageDetails.price * 1000;
+      const paymentPayload = { amount: amountinMillimes };
+
+      const paymentResponse = await axios.post('http://localhost:3001/payment/paymentStage', paymentPayload);
+      console.log("Payment link generated:", paymentResponse.data.result.developer_tracking_id);
+
+      // Save the payment ID
+      paymentId = paymentResponse.data.result.developer_tracking_id;
+      const newReservation = new Reservation({ stageId, userName, userEmail, phoneNumber, message, paymentId });
+      const savedReservation = await newReservation.save();
+      
+      res.redirect(paymentResponse.data.result.link);
+    }
+  } catch (error) {
+    console.error("Failed to create reservation:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
-  catch (error) {
-    res.status(500).send({ message: "Error creating reservation", error: error.message });
 }
-}
+
+
 
 export const listReservationsByid = async (req, res) => {
   const { stageId } = req.params;
@@ -33,7 +52,7 @@ export const listReservationsByid = async (req, res) => {
   }
 }
 
-// Get All Events
+// Get All Stages
 export const listReservations = async (req, res) => {
  try{
   let reservations = await Reservation.find({}).populate('stageId');
@@ -79,4 +98,20 @@ export const listReservations = async (req, res) => {
       res.status(500).json({ message: "Error updating reservation status", error: error.message });
     }
   };
+
+
+  export const deleteReservation = async (req, res) => {
+    const { reservationstageId } = req.params;
+    try {
+      const deletedReservation = await Reservation.findByIdAndDelete(reservationstageId);
+      if (!deletedReservation) {
+        return res.status(404).json({ message: "Reservation not found." });
+      }
+      res.json({ message: "Reservation deleted successfully." });
+    } catch (error) {
+      console.error("Error deleting reservation:", error);
+      res.status(500).json({ message: "Error deleting reservation", error: error.message });
+    }
+  };
+
 
