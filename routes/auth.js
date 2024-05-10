@@ -78,9 +78,4 @@ router.post('/ajouter2FA/:email',verifyToken, ajouter2FA);
 
 
 
-
-//added by ahmed
-router.get('/teachers', getTeachers);
-//router.get('/getAllUserByRole/:role',verifyToken,getAllUserByRole);
-
 export default router;
