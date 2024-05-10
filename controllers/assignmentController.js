@@ -18,8 +18,8 @@ export const createAssignment = async (req, res) => {
             deadlineTime
         } = req.body;
 
-        const picturePath = req.file.path; // Accédez au chemin du fichier téléchargé
-
+        const picturePath = req.file.filename; // Accédez au chemin du fichier téléchargé
+        console.log("file",req.file);
         console.log("Creating new assignment with title:", title);
         
         // Convertir la date de la deadline en objet Date

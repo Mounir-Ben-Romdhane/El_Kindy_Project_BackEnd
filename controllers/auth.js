@@ -54,7 +54,13 @@ export const login = async (req, res) => {
 
       if (!user || !isMatch) return res.status(400).json({ message: "Email or password not match !" });
 
+      let course = null; // Valeur par défaut pour le cours
 
+      // Vérifiez le rôle de l'utilisateur et affectez la valeur appropriée à `course`
+      if (user.roles.includes('student')) {
+          // Si l'utilisateur est un étudiant, affectez la valeur de `coursesEnrolled`
+          course = user.studentInfo.coursesEnrolled;
+      }
         
         //if (!isMatch) return res.status(400).json({ msg: "Invalid credentials." });
 
@@ -64,8 +70,9 @@ export const login = async (req, res) => {
         await user.save();
 
         const accessToken = jwt.sign({ id: user._id, fullName: user.firstName + " " + user.lastName,
-        roles: user.roles,  email : user.email, picturePath: user.picturePath, authSource: user.authSource, gender: user.gender  }, process.env.JWT_SECRET, {expiresIn:"10m"});
-     
+        roles: user.roles,  email : user.email, picturePath: user.picturePath, authSource: user.authSource,
+         gender: user.gender,  course: course
+      }, process.env.JWT_SECRET, {expiresIn:"10m"});
 
         if(!user.verified) {
             const url = `http://localhost:3000/verify-account/${user._id}/verify/${accessToken}`;
