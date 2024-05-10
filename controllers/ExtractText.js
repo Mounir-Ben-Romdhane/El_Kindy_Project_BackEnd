@@ -5,7 +5,7 @@ import { google } from 'googleapis';
 async function appendDataToSheet(auth, data) {
     const sheets = google.sheets({ version: 'v4', auth });
     const spreadsheetId = '1QoHnm1uRLN8VOrxTrkINykgG5xdCKRmPKthb3LBF5wI'; // Replace with your actual sheet ID
-    const range = 'A12'; // Start from cell A1
+    const range = 'A2'; // Start from cell A1
     const resource = {
         values: [
             [data.firstName, data.lastName, data.email, data.dateOfBirth, data.address, data.gender, data.phoneNumber1, data.phoneNumber2]
